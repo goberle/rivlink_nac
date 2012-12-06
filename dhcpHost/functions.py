@@ -1,21 +1,20 @@
 from models import dhcpHost
 import commands
+import re
 
-def get_ip(range=["10.20.0.100","10.20.0.255"]):
-	ips_used = dhcpHost.objects.all().values_list('ip_address', flat=True)
+def get_ip(range=["10.20.0.100","10.20.0.254"]):
+	ips_used = dhcpHost.objects.all().exclude(ip_address__isnull=True).values_list('ip_address', flat=True)
+	min_ip = DottedIPToInt(range[0])
+	max_ip = DottedIPToInt(range[1])
 	ips_used_list = list()
-	min = DottedIPToInt(range[0])
-	max = DottedIPToInt(range[1])
-	clean_ip = min
 	for ip in ips_used:
-		if ip:
-			ips_used_list.append(DottedIPToInt(ip))
+		ips_used_list.append(DottedIPToInt(ip))
 
-	while clean_ip < max:
-		if clean_ip not in ips_used_list: 
-			return IntToDottedIP(clean_ip)
+	while min_ip <= max_ip:
+		if min_ip not in ips_used_list: 
+			return IntToDottedIP(min_ip)
 		else:
-			clean_ip += 1
+			min_ip += 1 
 	return False
 
 def IntToDottedIP(intip):
@@ -34,6 +33,9 @@ def DottedIPToInt(dotted_ip):
         return(intip)
 
 def get_mac(ip):
+	match = re.match("(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})", ip)
+	if not match:
+		return None
 	mac = commands.getoutput('sudo arp -n %s'%ip).split()
 	try:
 		mac = mac[8]
