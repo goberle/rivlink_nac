@@ -1,0 +1,77 @@
+{% extends "dhcpHost/base.html" %}
+
+{% block title %}Mon profil{% endblock %}
+
+{% block nav.profil %}active{% endblock %}
+
+{% block content %}
+
+<h3>Mon profil</h3>
+
+
+<table class="table table-hover">
+<tbody>
+	<tr>
+		<td>Nom d'utilisateur</td>
+		<td><input type="text" placeholder="{{ user.username }}" disabled></td>
+	</tr>
+	<tr>
+		<td><label>Prénom</label></td>
+		<td><input type="text" placeholder="{{ user.first_name }}" disabled></td>
+	</tr>
+	<tr>
+		<td><label>Nom</label></td>
+		<td><input type="text" placeholder="{{ user.last_name }}" disabled></td>
+	</tr>
+	<tr>
+		<td><label>Email</label></td>
+		<td><input type="text" value="{{ user.email }}"></td>
+	</tr>
+	<tr>
+		<td><label>Mot de passe</label></td>
+		<td><input type="text"></td>
+	</tr>
+	<tr>
+		<td><label>Confirmer le mot de passe</label></td>
+		<td><input type="text"></td>
+	</tr>
+</tbody>
+</table>
+
+<!--
+<div >
+	<label>Nom d'utilisateur</label>
+	<input type="text" placeholder="{{ user.username }}" disabled>
+</div>
+<div >
+	<label>Prénom</label>
+	<input type="text" placeholder="{{ user.first_name }}" disabled>
+</div>
+<div >
+	<label>Nom</label>
+	<input type="text" placeholder="{{ user.last_name }}" disabled>
+</div>
+
+<div>
+	<label>Email</label>
+	<input type="text" placeholder="{{ user.email }}">
+</div>
+<div >
+	<label>Confirmer l'email</label>
+	<input type="text" placeholder="{{ user.email }}">
+</div>
+<div>
+	<label>Mot de passe</label>
+	<input type="text">
+</div>
+<div >
+	<label>Confirmer le mot de passe</label>
+	<input type="text">
+</div>
+
+<div>
+--!>
+<p>
+	<button class="btn btn-primary" type="button">Enregistrer les modifications</button>
+</p>
+{% endblock %}

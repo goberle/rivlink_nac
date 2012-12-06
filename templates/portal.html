@@ -1,0 +1,63 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<link rel="stylesheet" href="{% static 'css/bootstrap.css' %}" />
+        <style type="text/css">
+          body {
+            padding-top: 20px;
+            padding-bottom: 40px;
+          }
+          .container-narrow {
+            margin: 0 auto;
+            max-width: 700px;
+          }
+          .container-narrow > hr {
+            margin: 30px 0;
+          }
+          .jumbotron {
+            margin: 60px 0;
+            text-align: center;
+          }
+          .jumbotron h1 {
+            font-size: 72px;
+            line-height: 1;
+          }
+          .jumbotron .btn {
+            font-size: 21px;
+            padding: 14px 24px;
+          }
+          .marketing {
+            margin: 60px 0;
+          }
+          .marketing p + h4 {
+            margin-top: 28px;
+          }
+        </style>
+	<title>Portail</title>
+</head>
+
+<body>
+	
+    <div class="container-narrow">
+	    
+      <div class="jumbotron">
+        <h1>Bienvenue sur l'outil de gestion réseau de RivLink</h1>
+        <p class="lead">Cet outil vous permettera de choisir votre passerelle, de fixer une adresse IP fixe à votre serveur et d'ajouter votre serveur comme passerelle.</p>
+        <a class="btn btn-large btn-primary" href="/accounts/login/">Se connecter</a>
+        <a class="btn btn-large btn-success" href="/accounts/signup/">S'inscrire</a>
+      </div>
+
+      <hr>
+
+      <div class="footer">
+        <p>&copy; RivLink 2012</p>
+      </div>
+
+    </div>
+
+    <script src="http://code.jquery.com/jquery-latest.js"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+
+</body>
+</html>

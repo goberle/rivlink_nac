@@ -1,0 +1,26 @@
+{% extends "accounts/base.html" %}
+
+{% block title %}Connexion{% endblock %}
+
+{% block content %}
+      <form class="form" method="post" action="">
+	{% csrf_token %}
+        <h2 class="form-heading">Connexion</h2>
+	<label>Nom d'utilisateur</label>
+	{{ form.username }}
+	<label>Mot de passe</label>
+	{{ form.password }}
+        <label class="checkbox">
+          <input type="checkbox" value="remember-me"> Se souvenir de moi
+        </label>
+	{% if form.errors %}
+	  <p>
+	  <div class="alert alert-error">
+	    Le nom d'utilisateur ou le mot de passe est incorrect. Veuillez réeassayer.
+  	  </div>
+	  </p>
+	{% endif %}
+	<p><button class="btn btn-medium btn-primary" type="submit" value="login">Se connecter</button>
+	<a href="/accounts/password_reset/" class="btn btn-medium btn-info">Mot de passe perdu</a></p>
+	</form>
+{% endblock %}

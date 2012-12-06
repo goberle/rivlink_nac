@@ -1,0 +1,104 @@
+{% extends "dhcpHost/base.html" %}
+
+{% block title %}Passerelles{% endblock %}
+
+{% block nav.gateways %}active{% endblock %}
+
+{% block content %}
+
+<h3>Mes passerelles</h3>
+
+{% if my_gateways %}
+<table class="table table-hover">
+<thead>
+	<tr>
+		<th>Nom</th>
+		<th>Adresse MAC</th>
+		<th>Adresse IP</th>
+		<th>Action</th>
+	</tr>
+</thead>
+<tbody>
+	{% for gateway in my_gateways %}
+	<tr>
+	        <td>{{ gateway.name }}</td>
+	        <td>{{ gateway.mac_address }}</td>
+	        <td>{{ gateway.ip_address }}</td>
+		<td>
+			<a href="/dhcpHost/modify_gateway/{{ gateway.id }}/" class="btn btn-small btn-success">Modifier</a>
+			<a href="/dhcpHost/delete_gateway/{{ gateway.id }}/" class="btn btn-small btn-danger">Supprimer</a>
+		</td>
+	</tr>
+	{% endfor %}
+</tbody>
+</table>
+{% else %}
+<p>Vous n'avez pas de passerelles.</p>
+{% endif %}
+{% if error %}
+	<a href="#" class="btn btn-medium btn-primary disabled">TAjouter une passerelle</a>
+{% else %}
+	<a href="/dhcpHost/add_gateway" class="btn btn-medium btn-primary">Ajouter une passerelle</a>
+{% endif %}
+
+<hr>
+<h3>Mes clients</h3>
+
+{% if my_clients %}
+{{ my_clients.ip_address }}
+<table class="table table-hover">
+<thead>
+	<tr>
+		<th>Nom</th>
+		<th>Adresse MAC</th>
+		<th>Passerelle</th>
+		<th>Action</th>
+	</tr>
+</thead>
+<tbody>
+	{% for client in my_clients %}
+	<tr>
+		<td>{{ client.name }}@{{ client.owner.username }}</td>
+	        <td>{{ client.mac_address }}</td>
+		<td>{{ client.gateway }}</td>
+		<td><a href="/dhcpHost/delete_client/{{ client.id }}/" class="btn btn-small btn-danger">Supprimer</a></td>
+	</tr>
+	{% endfor %}
+</tbody>
+</table>
+{% else %}
+<p>Vous n'avez pas de clients.</p>
+{% endif %}
+
+<hr>
+<h3>Mes demandes</h3>
+
+{% if my_demands %}
+<table class="table table-hover">
+<thead>
+	<tr>
+		<th>Nom</th>
+		<th>Adresse MAC</th>
+		<th>Passerelle</th>
+		<th>Action</th>
+	</tr>
+</thead>
+<tbody>
+	{% for demand in my_demands %}
+	<tr>
+	        <td>{{ demand.name }}@{{ demand.owner.username }}</td>
+	        <td>{{ demand.mac_address }}</td>
+		<td>{{ demand.gateway }}</td>
+		<td>
+			<a href="/dhcpHost/accept_client/{{ demand.id }}/" class="btn btn-small btn-success">Accepter</a>
+			<a href="/dhcpHost/refuse_client/{{ demand.id }}/" class="btn btn-small btn-danger">Refuser</a>
+		</td>
+	</tr>
+	{% endfor %}
+</tbody>
+</table>
+{% else %}
+<p>Vous n'avez aucune demandes pour le moment.</p>
+{% endif %}
+
+{% endblock %}
