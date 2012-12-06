@@ -41,7 +41,7 @@ def add_gateway(request,
 	if request.method == "POST":
 		ip = get_ip()
 		if not ip:
-			error = "Il n'y a plus d'adresses IP fixe disponible pour créer une nouvelle passerelle."
+			error = "Il n'y a plus d'adresses IP fixes disponibles pour créer une nouvelle passerelle."
 			return TemplateResponse(request, 'dhcpHost/error.html', {'error': error})
 		form = add_gateway_form(user=request.user, ip=ip, data=request.POST)
        		if form.is_valid():
