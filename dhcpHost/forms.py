@@ -5,7 +5,7 @@ from functions import *
 
 class AddGatewayForm(forms.Form):
 	name = forms.CharField(label="Nom", max_length=20)
-	mac_address = forms.RegexField(label="Adresse MAC", max_length=17, regex=r'^([0-9a-fA-F]{2}([:-]?|$)){6}$', error_messages = {'invalid': "L'adresse MAC n'est pas valide. Elle doit être sous la forme XX:XX:XX:XX:XX:XX."})
+	mac_address = forms.RegexField(label="Adresse MAC", max_length=17, regex=r'^[0-9a-f]{2}([:][0-9a-f]{2}){5}$', error_messages = {'invalid': "L'adresse MAC n'est pas valide. Elle doit être sous la forme XX:XX:XX:XX:XX:XX."})
 	
 	def __init__(self, user, ip, *args, **kwargs):
         	self.user = user
@@ -39,7 +39,7 @@ class AddGatewayForm(forms.Form):
 
 class ModifyGatewayForm(forms.Form):
 	name = forms.CharField(label="Nom", max_length=20)
-	mac_address = forms.RegexField(label="Adresse MAC", max_length=17, regex=r'^([0-9a-fA-F]{2}([:-]?|$)){6}$', error_messages = {'invalid': "L'adresse MAC n'est pas valide. Elle doit être sous la forme XX:XX:XX:XX:XX:XX."})
+	mac_address = forms.RegexField(label="Adresse MAC", max_length=17, regex=r'^[0-9a-f]{2}([:][0-9a-f]{2}){5}$', error_messages = {'invalid': "L'adresse MAC n'est pas valide. Elle doit être sous la forme XX:XX:XX:XX:XX:XX."})
 
 	def __init__(self, gateway, user, *args, **kwargs):
 		self.user = user
@@ -70,7 +70,7 @@ class ModifyGatewayForm(forms.Form):
 
 class AddConfigGatewayForm(forms.Form):
 	name = forms.CharField(label="Nom", max_length=20)
-	mac_address = forms.RegexField(label="Adresse MAC", max_length=17, regex=r'^([0-9a-fA-F]{2}([:-]?|$)){6}$', error_messages = {'invalid': "L'adresse MAC n'est pas valide. Elle doit être sous la forme XX:XX:XX:XX:XX:XX."})
+	mac_address = forms.RegexField(label="Adresse MAC", max_length=17, regex=r'^[0-9a-f]{2}([:][0-9a-f]{2}){5}$', error_messages = {'invalid': "L'adresse MAC n'est pas valide. Elle doit être sous la forme XX:XX:XX:XX:XX:XX."})
 	ip_address = forms.BooleanField(label="Adresse IP fixe", required=False)
 	
 	def __init__(self, user, *args, **kwargs):
@@ -118,7 +118,7 @@ class AddConfigGatewayForm(forms.Form):
 
 class AddConfigIPForm(forms.Form):
 	name = forms.CharField(label="Nom", max_length=20)
-	mac_address = forms.RegexField(label="Adresse MAC", max_length=17, regex=r'^([0-9a-fA-F]{2}([:-]?|$)){6}$', error_messages = {'invalid': "L'adresse MAC n'est pas valide. Elle doit être sous la forme XX:XX:XX:XX:XX:XX."})
+	mac_address = forms.RegexField(label="Adresse MAC", max_length=17, regex=r'^[0-9a-f]{2}([:][0-9a-f]{2}){5}$', error_messages = {'invalid': "L'adresse MAC n'est pas valide. Elle doit être sous la forme XX:XX:XX:XX:XX:XX."})
 	
 	def __init__(self, user, ip, *args, **kwargs):
         	self.user = user
