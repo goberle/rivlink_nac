@@ -14,15 +14,13 @@ class AddGatewayForm(forms.Form):
 
 	def clean_name(self):
 		name = self.cleaned_data['name']
-		names_found = dhcpHost.objects.filter(name=name,owner=self.user.id)
-		if len(names_found) >= 1:
+		if dhcpHost.objects.filter(name=name,owner=self.user.id):
 			raise forms.ValidationError("Ce nom est déjà utilisé.")
 		return name
 
 	def clean_mac_address(self):
 		mac_address = self.cleaned_data['mac_address']
-	        macs_found = dhcpHost.objects.filter(mac_address__iexact=mac_address)
-		if len(macs_found) >= 1:
+		if dhcpHost.objects.filter(mac_address__iexact=mac_address):
 			raise forms.ValidationError("Cette addresse MAC est déjà utilisé.")
 		return mac_address
 	
@@ -49,16 +47,14 @@ class ModifyGatewayForm(forms.Form):
 	def clean_name(self):
 		name = self.cleaned_data['name']
 		if name != self.dhcpHost.name:
-			names_found = dhcpHost.objects.filter(name=name,owner=self.user.id)
-			if len(names_found) >= 1:
+			if dhcpHost.objects.filter(name=name,owner=self.user.id):
 				raise forms.ValidationError("Ce nom est déjà utilisé.")
 		return name
 
 	def clean_mac_address(self):
 		mac_address = self.cleaned_data['mac_address']
 		if mac_address != self.dhcpHost.mac_address:
-	        	macs_found = dhcpHost.objects.filter(mac_address__iexact=mac_address)
-			if len(macs_found) >= 1:
+			if dhcpHost.objects.filter(mac_address__iexact=mac_address):
 				raise forms.ValidationError("Cette addresse MAC est déjà utilisé.")
 		return mac_address
 	
@@ -83,15 +79,13 @@ class AddConfigGatewayForm(forms.Form):
 
 	def clean_name(self):
 		name = self.cleaned_data['name']
-		names_found = dhcpHost.objects.filter(name=name,owner=self.user.id)
-		if len(names_found) >= 1:
+		if dhcpHost.objects.filter(name=name,owner=self.user.id):
 			raise forms.ValidationError("Ce nom est déjà utilisé.")
 		return name
 
 	def clean_mac_address(self):
 		mac_address = self.cleaned_data['mac_address']
-	        macs_found = dhcpHost.objects.filter(mac_address__iexact=mac_address)
-		if len(macs_found) >= 1:
+		if dhcpHost.objects.filter(mac_address__iexact=mac_address):
 			raise forms.ValidationError("Cette addresse MAC est déjà utilisé.")
 		return mac_address
 
@@ -127,15 +121,13 @@ class AddConfigIPForm(forms.Form):
 
 	def clean_name(self):
 		name = self.cleaned_data['name']
-		names_found = dhcpHost.objects.filter(name=name,owner=self.user.id)
-		if len(names_found) >= 1:
+		if dhcpHost.objects.filter(name=name,owner=self.user.id):
 			raise forms.ValidationError("Ce nom est déjà utilisé.")
 		return name
 
 	def clean_mac_address(self):
 		mac_address = self.cleaned_data['mac_address']
-	        macs_found = dhcpHost.objects.filter(mac_address__iexact=mac_address)
-		if len(macs_found) >= 1:
+		if dhcpHost.objects.filter(mac_address__iexact=mac_address):
 			raise forms.ValidationError("Cette addresse MAC est déjà utilisé.")
 		return mac_address
 
