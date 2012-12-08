@@ -26,6 +26,8 @@ EMAIL_HOST_USER = 'rivlink@gmail.com'
 EMAIL_HOST_PASSWORD = ''
 EMAIL_USE_TLS = True
 
+DHCP_FIXED_IP_RANGE = ('10.20.0.100','10.20.0.254')
+
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.

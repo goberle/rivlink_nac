@@ -1,8 +1,9 @@
+from django.conf import settings
 from models import dhcpHost
 import commands
 import re
 
-def get_ip(range=["10.20.0.100","10.20.0.254"]):
+def get_ip(range=settings.DHCP_FIXED_IP_RANGE):
 	ips_used = dhcpHost.objects.all().exclude(ip_address__isnull=True).values_list('ip_address', flat=True)
 	min_ip = DottedIPToInt(range[0])
 	max_ip = DottedIPToInt(range[1])
