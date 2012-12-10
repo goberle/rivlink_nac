@@ -10,6 +10,7 @@ from django.views.decorators.debug import sensitive_post_parameters
 from django.contrib.auth.decorators import login_required
 from django.template.response import TemplateResponse
 from functions import *
+from dhcpHostLDAP import dhcpHostLDAP
 
 def home(request):
 	if request.user.is_authenticated():
@@ -45,8 +46,15 @@ def add_gateway(request,
 			return TemplateResponse(request, 'dhcpHost/error.html', {'error': error})
 		form = add_gateway_form(user=request.user, ip=ip, data=request.POST)
        		if form.is_valid():
-			#ADD LDAP
-            		form.save()
+			dhcpHost = form.save()
+			try:
+				ldap = dhcpHostLDAP()
+				ldap.add(dhcpHost.id,dhcpHost.mac_address,dhcpHost.ip_address)
+				ldap.close()
+			except:
+				dhcpHost.delete()
+				error = "Connexion au serveur LDAP impossible."
+				return TemplateResponse(request, 'dhcpHost/error.html', {'error': error})
             		return HttpResponseRedirect(post_change_redirect)
     	else:
 	    	form = add_gateway_form(user=request.user, ip=None)
@@ -57,12 +65,22 @@ def delete_gateway(request,
 		   dhcpHost_id,
 		   post_delete_redirect='/dhcpHost/gateways/'):
 	try:
-
 		gateway = dhcpHost.objects.get(owner=request.user.id, id=dhcpHost_id, is_gateway=1)
-		#DELETE LDAP
-		dhcpHost.objects.filter(gateway=gateway.ip_address, is_gateway=0).update(state=3)
-		gateway.delete()
-		return HttpResponseRedirect(post_delete_redirect)
+		clients = dhcpHost.objects.filter(gateway=gateway.ip_address, is_gateway=0)
+		try:
+			ldap = dhcpHostLDAP()
+			for client in clients:
+				if client.state == 1:
+					ldap.delete(client.id)
+				client.state = 3 
+				client.save()
+			ldap.delete(gateway.id)
+			ldap.close()
+			gateway.delete()
+			return HttpResponseRedirect(post_delete_redirect)
+		except:
+			error = "Connexion au serveur LDAP impossible."
+			return TemplateResponse(request, 'dhcpHost/error.html', {'error': error})
 	except:
 		return HttpResponseRedirect(post_delete_redirect)
 
@@ -91,10 +109,16 @@ def accept_client(request,
 		  dhcpHost_id,
 		  post_accept_redirect='/dhcpHost/gateways/'):
 	try:
-		client = dhcpHost.objects.get(id=dhcpHost_id, is_gateway=0)
+		client = dhcpHost.objects.get(id=dhcpHost_id, is_gateway=0, state=0)
 		my_gateways = dhcpHost.objects.filter(owner_id=request.user.id, is_gateway=1).values_list('ip_address', flat=True)
 		if client.gateway in my_gateways:
-			#ADD LDAP
+			try:
+				ldap = dhcpHostLDAP()
+				ldap.add(client.id,client.mac_address,ip_address=client.ip_address,gateway=client.gateway)
+				ldap.close()
+			except:
+				error = "Connexion au serveur LDAP impossible."
+				return TemplateResponse(request, 'dhcpHost/error.html', {'error': error})
 			client.state = 1
 			client.save()
 		return HttpResponseRedirect(post_accept_redirect)
@@ -106,7 +130,7 @@ def refuse_client(request,
 		  dhcpHost_id,
 		  post_refuse_redirect='/dhcpHost/gateways/'):
 	try:
-		client = dhcpHost.objects.get(id=dhcpHost_id, is_gateway=0)
+		client = dhcpHost.objects.get(id=dhcpHost_id, is_gateway=0, state=0)
 		my_gateways = dhcpHost.objects.filter(owner_id=request.user.id, is_gateway=1).values_list('ip_address', flat=True)
 		if client.gateway in my_gateways:
 			client.state = 2
@@ -120,10 +144,16 @@ def delete_client(request,
 		  dhcpHost_id,
 		  post_delete_redirect='/dhcpHost/gateways/'):
 	try:
-		client = dhcpHost.objects.get(id=dhcpHost_id, is_gateway=0)
+		client = dhcpHost.objects.get(id=dhcpHost_id, is_gateway=0, state=1)
 		my_gateways = dhcpHost.objects.filter(owner_id=request.user.id, is_gateway=1).values_list('ip_address', flat=True)
 		if client.gateway in my_gateways:
-			#DEL LDAP
+			try:
+				ldap = dhcpHostLDAP()
+				ldap.delete(client.id)
+				ldap.close()
+			except:
+				error = "Connexion au serveur LDAP impossible."
+				return TemplateResponse(request, 'dhcpHost/error.html', {'error': error})
 			client.state = 3
 			client.save()
 		return HttpResponseRedirect(post_delete_redirect)
@@ -169,8 +199,15 @@ def add_config_ip(request,
 			return TemplateResponse(request, 'dhcpHost/error.html', {'error': error})
 		form = add_config_ip_form(user=request.user, ip=ip, data=request.POST)
        		if form.is_valid():
-			#ADD LDAP
-            		form.save()
+			dhcpHost = form.save()
+			try:
+				ldap = dhcpHostLDAP()
+				ldap.add(dhcpHost.id,dhcpHost.mac_address,dhcpHost.ip_address)
+				ldap.close()
+			except:
+				dhcpHost.delete()
+				error = "Connexion au serveur LDAP impossible."
+				return TemplateResponse(request, 'dhcpHost/error.html', {'error': error})
             		return HttpResponseRedirect(post_change_redirect)
     	else:
 		form = add_config_ip_form(user=request.user, ip=None, initial={'mac_address': get_mac(request.META['REMOTE_ADDR'])})
@@ -182,8 +219,16 @@ def delete_config(request,
 		  dhcpHost_id,
 		  post_delete_redirect='/dhcpHost/configs/'):
 	try:
-		#DELETE LDAP
-		dhcpHost.objects.get(owner=request.user.id, id=dhcpHost_id, is_gateway=0).delete()
+		config = dhcpHost.objects.get(owner=request.user.id, id=dhcpHost_id, is_gateway=0)
+		if config.state == 1:
+			try:
+				ldap = dhcpHostLDAP()
+				ldap.delete(config.id)
+				ldap.close()
+			except:
+				error = "Connexion au serveur LDAP impossible."
+				return TemplateResponse(request, 'dhcpHost/error.html', {'error': error})
+		config.delete()
 		return HttpResponseRedirect(post_delete_redirect)
 	except:
 		return HttpResponseRedirect(post_delete_redirect)

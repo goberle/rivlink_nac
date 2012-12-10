@@ -30,6 +30,11 @@ EMAIL_HOST_USER = 'rivlink@gmail.com'
 EMAIL_HOST_PASSWORD = ''
 EMAIL_USE_TLS = True
 
+LDAP_HOST = "ldap://localhost/"
+LDAP_USER = "cn=admin,dc=az0,dc=pl"
+LDAP_PASSWORD = "password"
+LDAP_BASE_DN = 'cn=dhcp,dc=az0,dc=pl'
+
 DHCP_FIXED_IP_RANGE = ('10.20.0.100','10.20.0.254')
 
 # Local time zone for this installation. Choices can be found here:
