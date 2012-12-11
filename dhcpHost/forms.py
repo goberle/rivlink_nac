@@ -2,6 +2,7 @@
 from django import forms
 from models import dhcpHost
 from functions import *
+from dhcpHostLDAP import dhcpHostLDAP
 
 class AddGatewayForm(forms.Form):
 	name = forms.CharField(label="Nom", max_length=20)
@@ -37,7 +38,7 @@ class AddGatewayForm(forms.Form):
 
 class ModifyGatewayForm(forms.Form):
 	name = forms.CharField(label="Nom", max_length=20)
-	mac_address = forms.RegexField(label="Adresse MAC", max_length=17, regex=r'^[0-9a-f]{2}([:][0-9a-f]{2}){5}$', error_messages = {'invalid': "L'adresse MAC n'est pas valide. Elle doit être sous la forme XX:XX:XX:XX:XX:XX."})
+	#mac_address = forms.RegexField(label="Adresse MAC", max_length=17, regex=r'^[0-9a-f]{2}([:][0-9a-f]{2}){5}$', error_messages = {'invalid': "L'adresse MAC n'est pas valide. Elle doit être sous la forme XX:XX:XX:XX:XX:XX."})
 
 	def __init__(self, gateway, user, *args, **kwargs):
 		self.user = user
@@ -51,17 +52,17 @@ class ModifyGatewayForm(forms.Form):
 				raise forms.ValidationError("Ce nom est déjà utilisé.")
 		return name
 
-	def clean_mac_address(self):
-		mac_address = self.cleaned_data['mac_address']
-		if mac_address != self.dhcpHost.mac_address:
-			if dhcpHost.objects.filter(mac_address__iexact=mac_address):
-				raise forms.ValidationError("Cette addresse MAC est déjà utilisé.")
-		return mac_address
+	#def clean_mac_address(self):
+	#	mac_address = self.cleaned_data['mac_address']
+	#	if mac_address != self.dhcpHost.mac_address:
+	#		if dhcpHost.objects.filter(mac_address__iexact=mac_address):
+	#			raise forms.ValidationError("Cette addresse MAC est déjà utilisé.")
+	#	return mac_address
 	
 	def save(self):
 		self.dhcpHost.name = self.cleaned_data['name']
-		self.dhcpHost.mac_address = self.cleaned_data['mac_address']
-            	self.dhcpHost.save()
+		#self.dhcpHost.mac_address = self.cleaned_data['mac_address']
+		self.dhcpHost.save()
         	return self.dhcpHost
 
 class AddConfigGatewayForm(forms.Form):

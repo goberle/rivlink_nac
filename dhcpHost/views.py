@@ -92,14 +92,15 @@ def modify_gateway(request,
 		   modify_gateway_form=ModifyGatewayForm):
 	try:
 		gateway = dhcpHost.objects.get(id=dhcpHost_id, owner=request.user.id, is_gateway=1)
+		old_mac = gateway.mac_address
 		if request.method == "POST":
 			form = modify_gateway_form(gateway=gateway, user=request.user, data=request.POST)
 			if form.is_valid():
-				#MODIFY LDAP
 				form.save()
 				return HttpResponseRedirect(post_modify_redirect)
 		else:
-			form = modify_gateway_form(gateway, user=request.user, initial={'name': gateway.name, 'mac_address': gateway.mac_address})
+			#form = modify_gateway_form(gateway, user=request.user, initial={'name': gateway.name, 'mac_address': gateway.mac_address})
+			form = modify_gateway_form(gateway, user=request.user, initial={'name': gateway.name})
 		return TemplateResponse(request, template_name, {'form': form})
 	except:
 		return HttpResponseRedirect(post_modify_redirect)
