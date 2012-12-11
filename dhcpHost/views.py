@@ -92,7 +92,6 @@ def modify_gateway(request,
 		   modify_gateway_form=ModifyGatewayForm):
 	try:
 		gateway = dhcpHost.objects.get(id=dhcpHost_id, owner=request.user.id, is_gateway=1)
-		old_mac = gateway.mac_address
 		if request.method == "POST":
 			form = modify_gateway_form(gateway=gateway, user=request.user, data=request.POST)
 			if form.is_valid():

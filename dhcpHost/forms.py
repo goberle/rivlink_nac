@@ -2,7 +2,6 @@
 from django import forms
 from models import dhcpHost
 from functions import *
-from dhcpHostLDAP import dhcpHostLDAP
 
 class AddGatewayForm(forms.Form):
 	name = forms.CharField(label="Nom", max_length=20)
