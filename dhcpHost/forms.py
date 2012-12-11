@@ -75,7 +75,7 @@ class AddConfigGatewayForm(forms.Form):
 		# On déclare le field ici pour qu'il soit mis à jour à chaque appel du formulaire
 		choices = [(c[0], '%s@%s'%(c[1],c[2])) \
 			for c in dhcpHost.objects.filter(is_gateway=1, state=1).values_list('ip_address','name','owner__username')]
-		self.fields['gateway'] = forms.ChoiceField(choices=choices) 
+		self.fields['gateway'] = forms.ChoiceField(label="Passerelle",choices=choices) 
 
 	def clean_name(self):
 		name = self.cleaned_data['name']
