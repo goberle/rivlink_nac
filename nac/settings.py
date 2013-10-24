@@ -15,25 +15,27 @@ MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'nac',                      # Or path to database file if using sqlite3.
-        'USER': 'nac',                      # Not used with sqlite3.
-        'PASSWORD': 'password',                  # Not used with sqlite3.
+        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': os.path.join(PROJECT_DIR, 'nac.db'),
+        'USER': '',                      # Not used with sqlite3.
+        'PASSWORD': '',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
 }
 
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = "587"
-EMAIL_HOST_USER = 'rivlink@gmail.com'
+EMAIL_HOST = ''
+EMAIL_PORT = ''
+EMAIL_HOST_USER = ''
 EMAIL_HOST_PASSWORD = ''
 EMAIL_USE_TLS = True
 
-LDAP_HOST = "ldap://localhost/"
-LDAP_USER = "cn=admin,dc=az0,dc=pl"
-LDAP_PASSWORD = "password"
-LDAP_BASE_DN = 'cn=dhcp,dc=az0,dc=pl'
+# Connect to LDAP via OMAPI Protocol
+
+OMAPI_KEYNAME="omapi_key"
+OMAPI_KEY="{secret}"
+OMAPI_IP="10.20.0.1"
+OMAPI_PORT="7911"
 
 DHCP_FIXED_IP_RANGE = ('10.20.0.100','10.20.0.254')
 

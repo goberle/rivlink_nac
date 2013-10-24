@@ -1,144 +1,68 @@
 # -*- coding: Utf-8 -*-
 from django import forms
-from models import dhcpHost
+from models import DhcpHost, DhcpGateway
 from functions import *
 
 class AddGatewayForm(forms.Form):
-	name = forms.CharField(label="Nom", max_length=20)
-	mac_address = forms.RegexField(label="Adresse MAC", max_length=17, regex=r'^[0-9a-f]{2}([:][0-9a-f]{2}){5}$', error_messages = {'invalid': "L'adresse MAC n'est pas valide. Elle doit être sous la forme XX:XX:XX:XX:XX:XX."})
-	
-	def __init__(self, user, ip, *args, **kwargs):
-        	self.user = user
-		self.ip = ip
-        	super(AddGatewayForm, self).__init__(*args, **kwargs)
+    
+    def __init__(self, user, *args, **kwargs):
+        self.user = user
+        super(AddGatewayForm, self).__init__(*args, **kwargs)
+        choices = [(c, c) for c in get_ip_list()]
+        self.fields['ip_address'] = forms.ChoiceField(label="Passerelle", choices=choices) 
 
-	def clean_name(self):
-		name = self.cleaned_data['name']
-		if dhcpHost.objects.filter(name=name,owner=self.user.id):
-			raise forms.ValidationError("Ce nom est déjà utilisé.")
-		return name
+    def clean_ip_address(self):
+        ip_address = self.cleaned_data['ip_address']
+        if not is_ip_authorized(ip_address):
+            raise forms.ValidationError("Cette addresse IP n'est pas autorisée, choisissez en une dans la liste.")
+        return ip_address
+    
+    def get_dhcp_gateway(self):
+        gw = DhcpGateway()
+        gw.owner_id = self.user.id
+        gw.ip_address = self.cleaned_data['ip_address']
+        return gw
 
-	def clean_mac_address(self):
-		mac_address = self.cleaned_data['mac_address']
-		if dhcpHost.objects.filter(mac_address__iexact=mac_address):
-			raise forms.ValidationError("Cette addresse MAC est déjà utilisé.")
-		return mac_address
-	
-	def save(self):
-		self.dhcpHost = dhcpHost()
-        	self.dhcpHost.owner_id = self.user.id
-		self.dhcpHost.name = self.cleaned_data['name']
-		self.dhcpHost.mac_address = self.cleaned_data['mac_address']
-		self.dhcpHost.ip_address = self.ip
-		self.dhcpHost.state = 1
-		self.dhcpHost.is_gateway = 1
-            	self.dhcpHost.save()
-        	return self.dhcpHost
+class AddHostForm(forms.Form):
+    name = forms.CharField(label="Identifiant", max_length=20)
+    mac_address = forms.RegexField(label="Adresse MAC", max_length=17, regex=r'^[0-9a-f]{2}([:][0-9a-f]{2}){5}$', error_messages = {'invalid': "L'adresse MAC n'est pas valide. Elle doit être sous la forme XX:XX:XX:XX:XX:XX."})
+    ip_address = forms.BooleanField(label="Besoin d'une IP fixe (serveur)", required=False)
+    
+    def __init__(self, user, *args, **kwargs):
+        self.user = user
+        super(AddHostForm, self).__init__(*args, **kwargs)
+        # On déclare le field ici pour qu'il soit mis à jour à chaque appel du formulaire
+        choices = [(c[0], '%s@%s'%(c[1], c[2])) \
+            for c in DhcpGateway.objects.all().values_list('ip_address','name','owner__username')]
+        self.fields['gateway'] = forms.ChoiceField(label="Passerelle", choices=choices) 
 
-class ModifyGatewayForm(forms.Form):
-	name = forms.CharField(label="Nom", max_length=20)
-	#mac_address = forms.RegexField(label="Adresse MAC", max_length=17, regex=r'^[0-9a-f]{2}([:][0-9a-f]{2}){5}$', error_messages = {'invalid': "L'adresse MAC n'est pas valide. Elle doit être sous la forme XX:XX:XX:XX:XX:XX."})
+    def clean_name(self):
+        name = self.cleaned_data['name']
+        if DhcpHost.objects.filter(name=name, owner=self.user.id):
+            raise forms.ValidationError("Cet identifiant est déjà utilisé.")
+        return name
 
-	def __init__(self, gateway, user, *args, **kwargs):
-		self.user = user
-		self.dhcpHost = gateway
-		super(ModifyGatewayForm, self).__init__(*args, **kwargs)
-	
-	def clean_name(self):
-		name = self.cleaned_data['name']
-		if name != self.dhcpHost.name:
-			if dhcpHost.objects.filter(name=name,owner=self.user.id):
-				raise forms.ValidationError("Ce nom est déjà utilisé.")
-		return name
+    def clean_mac_address(self):
+        mac_address = self.cleaned_data['mac_address']
+        if DhcpHost.objects.filter(mac_address__iexact=mac_address):
+            raise forms.ValidationError("Cette addresse MAC est déjà utilisée.")
+        return mac_address
 
-	#def clean_mac_address(self):
-	#	mac_address = self.cleaned_data['mac_address']
-	#	if mac_address != self.dhcpHost.mac_address:
-	#		if dhcpHost.objects.filter(mac_address__iexact=mac_address):
-	#			raise forms.ValidationError("Cette addresse MAC est déjà utilisé.")
-	#	return mac_address
-	
-	def save(self):
-		self.dhcpHost.name = self.cleaned_data['name']
-		#self.dhcpHost.mac_address = self.cleaned_data['mac_address']
-		self.dhcpHost.save()
-        	return self.dhcpHost
+    def clean_ip_address(self):
+        if self.cleaned_data['ip_address'] == True:
+            ip = get_ip()
+            if ip:
+                return ip
+            else:
+                raise forms.ValidationError("Il n'y a plus d'adresses IP fixes disponibles.")
+        return None
 
-class AddConfigGatewayForm(forms.Form):
-	name = forms.CharField(label="Nom", max_length=20)
-	mac_address = forms.RegexField(label="Adresse MAC", max_length=17, regex=r'^[0-9a-f]{2}([:][0-9a-f]{2}){5}$', error_messages = {'invalid': "L'adresse MAC n'est pas valide. Elle doit être sous la forme XX:XX:XX:XX:XX:XX."})
-	ip_address = forms.BooleanField(label="Adresse IP fixe", required=False)
-	
-	def __init__(self, user, *args, **kwargs):
-        	self.user = user
-        	super(AddConfigGatewayForm, self).__init__(*args, **kwargs)
-		# On déclare le field ici pour qu'il soit mis à jour à chaque appel du formulaire
-		choices = [(c[0], '%s@%s'%(c[1],c[2])) \
-			for c in dhcpHost.objects.filter(is_gateway=1, state=1).values_list('ip_address','name','owner__username')]
-		self.fields['gateway'] = forms.ChoiceField(label="Passerelle",choices=choices) 
+    def get_dhcp_host(self):
+        host = DhcpHost()
+        host.owner_id = self.user.id
+        host.name = self.cleaned_data['name']
+        host.mac_address = self.cleaned_data['mac_address']
+        host.gateway = DhcpGateway.objects.get(ip_address=self.cleaned_data['gateway'])
+        host.state = DhcpHost.WAITING_VALIDATION
+        return host
 
-	def clean_name(self):
-		name = self.cleaned_data['name']
-		if dhcpHost.objects.filter(name=name,owner=self.user.id):
-			raise forms.ValidationError("Ce nom est déjà utilisé.")
-		return name
-
-	def clean_mac_address(self):
-		mac_address = self.cleaned_data['mac_address']
-		if dhcpHost.objects.filter(mac_address__iexact=mac_address):
-			raise forms.ValidationError("Cette addresse MAC est déjà utilisé.")
-		return mac_address
-
-	def clean_ip_address(self):
-		if self.cleaned_data['ip_address'] == True:
-			ip = get_ip()
-			if ip:
-				return ip
-			else:
-				raise forms.ValidationError("Il n'y a plus d'adresses IP fixe disponible.")
-		return None
-
-	def save(self):
-		self.dhcpHost = dhcpHost()
-        	self.dhcpHost.owner_id = self.user.id
-		self.dhcpHost.name = self.cleaned_data['name']
-		self.dhcpHost.mac_address = self.cleaned_data['mac_address']
-		self.dhcpHost.ip_address = self.cleaned_data['ip_address']
-		self.dhcpHost.gateway = self.cleaned_data['gateway']
-		self.dhcpHost.state = 0
-		self.dhcpHost.is_gateway = 0
-            	self.dhcpHost.save()
-        	return self.dhcpHost
-
-class AddConfigIPForm(forms.Form):
-	name = forms.CharField(label="Nom", max_length=20)
-	mac_address = forms.RegexField(label="Adresse MAC", max_length=17, regex=r'^[0-9a-f]{2}([:][0-9a-f]{2}){5}$', error_messages = {'invalid': "L'adresse MAC n'est pas valide. Elle doit être sous la forme XX:XX:XX:XX:XX:XX."})
-	
-	def __init__(self, user, ip, *args, **kwargs):
-        	self.user = user
-		self.ip = ip
-        	super(AddConfigIPForm, self).__init__(*args, **kwargs)
-
-	def clean_name(self):
-		name = self.cleaned_data['name']
-		if dhcpHost.objects.filter(name=name,owner=self.user.id):
-			raise forms.ValidationError("Ce nom est déjà utilisé.")
-		return name
-
-	def clean_mac_address(self):
-		mac_address = self.cleaned_data['mac_address']
-		if dhcpHost.objects.filter(mac_address__iexact=mac_address):
-			raise forms.ValidationError("Cette addresse MAC est déjà utilisé.")
-		return mac_address
-
-	def save(self):
-		self.dhcpHost = dhcpHost()
-        	self.dhcpHost.owner_id = self.user.id
-		self.dhcpHost.name = self.cleaned_data['name']
-		self.dhcpHost.mac_address = self.cleaned_data['mac_address']
-		self.dhcpHost.ip_address = self.ip
-		self.dhcpHost.gateway = None
-		self.dhcpHost.state = 1
-		self.dhcpHost.is_gateway = 0
-            	self.dhcpHost.save()
-        	return self.dhcpHost

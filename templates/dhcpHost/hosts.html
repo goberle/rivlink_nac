@@ -2,17 +2,17 @@
 
 {% block title %}Configurations{% endblock %}
 
-{% block nav.configs %}active{% endblock %}
+{% block nav.hosts %}active{% endblock %}
 
 {% block content %}
 
 <h3>Mes configurations</h3>
 
-{% if my_configs %}
+{% if hosts %}
 <table class="table table-hover">
 <thead>
 	<tr>
-		<th>Nom</th>
+		<th>Identifiant</th>
 		<th>Adresse MAC</th>
 		<th>Adresse IP fixe</th>
 		<th>Passerelle</th>
@@ -21,15 +21,15 @@
 	</tr>
 </thead>
 <tbody>
-	{% for config in my_configs %}
+	{% for host in hosts %}
 	<tr>
-	        <td>{{ config.name }}</td>
-	        <td>{{ config.mac_address }}</td>
-		<td>{% if not config.ip_address %}Non{% else %}{{ config.ip_address }}{% endif %}</td>
-		<td>{{ config.gateway }}</td>
-		{% if config.state == 0 %}<td class=text-info>Demande en cours{% elif config.state == 1 %}<td class=text-success>Actif{% elif config.state == 2%}<td class=text-error>Refusé{% else %}<td class=text-error>Supprimé{% endif %}</td>
+	        <td>{{ host.name }}</td>
+	        <td>{{ host.mac_address }}</td>
+		<td>{% if not host.ip_address %}Non{% else %}{{ host.ip_address }}{% endif %}</td>
+                <td>{% if not host.gateway %}Non{% else %}{{ host.gateway.ip_address }}{% endif %}</td>
+		{% if host.state == 'W' %}<td class=text-info>Demande en cours{% elif config.state == 'V' %}<td class=text-success>Actif{% elif config.state == 'U' %}<td class=text-error>Refusé/Supprimé{% endif %}</td>
 		<td>
-			<a href="/dhcpHost/delete_config/{{ config.id }}/" class="btn btn-small btn-danger">Supprimer</a>
+			<a href="/dhcpHost/delete_host/{{ host.id }}/" class="btn btn-small btn-danger">Supprimer</a>
 		</td>
 	</tr>
 	{% endfor %}
