@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 
 class DhcpGateway(models.Model):
     owner = models.ForeignKey(User)
+    name = models.CharField(max_length=10)
     ip_address = models.IPAddressField(unique=True, primary_key=True)
 
 class DhcpHost(models.Model):

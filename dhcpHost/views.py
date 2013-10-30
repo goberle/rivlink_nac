@@ -35,7 +35,15 @@ def add_gateway(request, template_name='dhcpHost/add_gateway.html', post_change_
             if not gw.ip_address:
                 error = "Il n'y a plus d'adresses IP fixes disponibles pour créer une nouvelle passerelle."
                 return TemplateResponse(request, 'dhcpHost/error.html', {'error': error})
-            gw.save()
+            try:
+                omapi = NacOmapi.get_instance()
+                omapi.add_group(gw.name, gw.ip_address)
+                omapi.close()
+                gw.save()
+            except Exception as err:
+                print err
+                error = "Connexion au serveur DHCP impossible."
+                return TemplateResponse(request, 'dhcpHost/error.html', {'error': error})
             return HttpResponseRedirect(post_change_redirect)
         else:
             form = add_gateway_form(user=request.user)
@@ -55,7 +63,15 @@ def delete_gateway(request, gw_id, post_delete_redirect='/dhcpHost/gateways/'):
                     client.state = DhcpHost.UNLINKED
                     client.save()
                 omapi.close()
-            gateway.delete()
+            try:
+                omapi = NacOmapi.get_instance()
+                omapi.del_group(gateway.name)
+                omapi.close()
+                gateway.delete()
+            except Exception as err:
+                print err
+                error = "Connexion au serveur DHCP impossible."
+                return TemplateResponse(request, 'dhcpHost/error.html', {'error': error})
             return HttpResponseRedirect(post_delete_redirect)
         except Exception as e:
             # TODO log !
@@ -136,12 +152,11 @@ def add_host(request, template_name='dhcpHost/add_host.html', post_change_redire
             host = form.get_dhcp_host()
             try:
                 omapi = NacOmapi.get_instance()
-                # TODO Add IP
-                omapi.add_host_with_gateway(host.mac_address, host.gateway.ip_address)
+                omapi.add_host_with_group(host.mac_address, host.gateway.name)
                 omapi.close()
                 host.save()
-            except:
-                host.delete()
+            except Exception as err:
+                print err
                 error = "Connexion au serveur DHCP impossible."
                 return TemplateResponse(request, 'dhcpHost/error.html', {'error': error})
             return HttpResponseRedirect(post_change_redirect)

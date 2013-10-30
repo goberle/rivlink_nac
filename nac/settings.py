@@ -35,7 +35,7 @@ EMAIL_USE_TLS = True
 OMAPI_KEYNAME="omapi_key"
 OMAPI_KEY="{secret}"
 OMAPI_IP="10.20.0.1"
-OMAPI_PORT="7911"
+OMAPI_PORT=7911
 
 DHCP_FIXED_IP_RANGE = ('10.20.0.100','10.20.0.254')
 
@@ -138,6 +138,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
     # 'django.contrib.admindocs',
+    'bootstrap_toolkit',
     'dhcpHost',
     'accounts',
 )
