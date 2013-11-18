@@ -8,7 +8,7 @@
 
 <form action="" method="post">
 	{% csrf_token %}
-	<h3 class="form-heading">Ajout d'une configuration</h3>
+	<h3 class="form-heading">Ajout d'une adresse MAC</h3>
 	{% for field in form %}
 		<p>
 		{{ field.label_tag }} {{ field }}
@@ -17,7 +17,7 @@
 		{% endif %}
 		</p>
 	{% endfor %}
-<p><button class="btn btn-medium btn-primary" type="submit">Ajouter la configuration</button></p>
+<p><button class="btn btn-medium btn-primary" type="submit">Ajouter</button></p>
 </form>
 
 {% endblock %}

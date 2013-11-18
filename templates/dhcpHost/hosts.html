@@ -1,0 +1,44 @@
+{% extends "dhcpHost/base.html" %}
+
+{% block title %}Configurations{% endblock %}
+
+{% block nav.hosts %}active{% endblock %}
+
+{% block content %}
+
+<h3>Mes configurations</h3>
+
+{% if hosts %}
+<table class="table table-hover">
+<thead>
+	<tr>
+		<th>Identifiant</th>
+		<th>Adresse MAC</th>
+		<th>Adresse IP fixe</th>
+		<th>Passerelle</th>
+		<th>État</th>
+		<th>Action</th>
+	</tr>
+</thead>
+<tbody>
+	{% for host in hosts %}
+	<tr>
+	        <td>{{ host.name }}</td>
+	        <td>{{ host.mac_address }}</td>
+		<td>{% if not host.ip_address %}Non{% else %}{{ host.ip_address }}{% endif %}</td>
+                <td>{% if not host.gateway %}Non{% else %}{{ host.gateway.ip_address }}{% endif %}</td>
+		{% if host.state == 'W' %}<td class=text-info>Demande en cours{% elif config.state == 'V' %}<td class=text-success>Actif{% elif config.state == 'U' %}<td class=text-error>Refusé/Supprimé{% endif %}</td>
+		<td>
+			<a href="/dhcpHost/delete_host/{{ host.id }}/" class="btn btn-small btn-danger">Supprimer</a>
+		</td>
+	</tr>
+	{% endfor %}
+</tbody>
+</table>
+{% else %}
+<p>Vous n'avez aucune configurations pour le moment.</p>
+<p class="text-success">Si vous souhaitez disposer d'internet vous pouvez en faire la demande via le boutton <strong>Ajouter une passerelle</strong>.</p>
+{% endif %}
+<a href="/dhcpHost/add_host/" class="btn btn-medium btn-primary">Ajouter une adresse MAC</a>
+
+{% endblock %}

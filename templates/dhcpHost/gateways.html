@@ -13,8 +13,6 @@
 	<table class="table table-hover">
 	<thead>
 		<tr>
-			<th>Nom</th>
-			<th>Adresse MAC</th>
 			<th>Adresse IP</th>
 			<th>Action</th>
 		</tr>
@@ -22,12 +20,9 @@
 	<tbody>
 		{% for gateway in my_gateways %}
 		<tr>
-		        <td>{{ gateway.name }}</td>
-		        <td>{{ gateway.mac_address }}</td>
 		        <td>{{ gateway.ip_address }}</td>
 			<td>
-				<a href="/dhcpHost/modify_gateway/{{ gateway.id }}/" class="btn btn-small btn-success">Modifier</a>
-				<a href="/dhcpHost/delete_gateway/{{ gateway.id }}/" class="btn btn-small btn-danger">Supprimer</a>
+				<a href="/dhcpHost/delete_gateway/{{ gateway.ip_address }}/" class="btn btn-small btn-danger">Supprimer</a>
 			</td>
 		</tr>
 		{% endfor %}
@@ -97,7 +92,7 @@
 
 
 {% else %}
-	<h3>Mes partages</h3>
+	<h3>Mes passerelles</h3>
 	<p>Si vous souhaitez partager votre connexion internet à travers le réseau, cette outil vous permettra d'apparaitre dans la liste des passerelles lorsque vos clients configurerons leurs ordinateurs.</p>
 	<p>Pour réaliser correctement votre partage internet, vous aurez besoin également de disposer d'un routeur suffisament configurable pour ne partager internet qu'a vos clients.</p>
        	<p class="text-error">Le but de cette outil n'est aucunement de partager internet, mais de simplifier la configuration de vos clients.</p>
